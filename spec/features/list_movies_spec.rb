@@ -48,4 +48,60 @@ describe 'Viewing the list of movies' do
 
     expect(page).to have_content("Flop!")
   end 
+
+  it "updates the movie and shows the movie's updated details" do
+    movie_1 = Movie.create(title: 'Avengers Infinity War', rating: 'PG-13', total_gross: 2955123987, description: 'Thanos comes in looking for the infinity stones', released_on: "2018-02-02")
+
+    visit movie_url(movie_1)
+
+    click_link 'Edit'
+
+    expect(current_path).to eq(edit_movie_path(movie_1))
+
+    expect(find_field('Title').value).to eq(movie_1.title)
+  end
+
+  it "updates the movie and shows the movie's updated details" do
+    movie = Movie.create(title: 'Avengers Infinity War', rating: 'PG-13', total_gross: 2955123987, description: 'Thanos comes in looking for the infinity stones', released_on: "2018-02-02")
+
+    visit movie_url(movie)
+
+    click_link 'Edit'
+
+    expect(current_path).to eq(edit_movie_path(movie))
+
+    expect(find_field('Title').value).to eq(movie.title)
+
+    fill_in 'Title', with: "Updated Movie Title"
+
+    click_button 'Update Movie'
+
+    expect(current_path).to eq(movie_path(movie))
+
+    expect(page).to have_text('Updated Movie Title')
+  end
+  
+  it "saves the movie and shows the new movie's details" do
+    visit movies_url
+
+    click_link 'Add New Movie'
+
+    expect(current_path).to eq(new_movie_path)
+
+    fill_in "Title", with: "New Movie Title"
+    fill_in "Description", with: "Superheroes saving the world from villains"
+    fill_in "Rating", with: "PG-13"
+    fill_in "Total gross", with: "75000000"
+    select (Time.now.year - 1).to_s, :from => "movie_released_on_1i"
+
+    # If you're taking advantage of the HTML 5 date field in Chrome,
+    # you'll need to use 'fill_in' rather than 'select'
+    # fill_in "Released on", with: (Time.now.year - 1).to_s
+
+    click_button 'Create Movie'
+
+    expect(current_path).to eq(movie_path(Movie.last))
+
+    expect(page).to have_text('New Movie Title')
+  end
 end
